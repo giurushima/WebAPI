@@ -1,15 +1,14 @@
-﻿//using Domain.Entities;
-//using Domain.Interfaces.Users;
-//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Text;
-//using System.Threading.Tasks;
+﻿using Domain.Entities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-//namespace Domain.Interfaces.Auth
-//{
-//    public interface IAuthenticationRepository
-//    {
-//        User? ValidateUser(AuthenticationRequestBody authenticationRequestBody);
-//    }
-//}
+namespace Domain.Interfaces.Users
+{
+    public interface IAuthenticationRepository
+    {
+        User? Authenticate(string username, string password);
+    }
+}
