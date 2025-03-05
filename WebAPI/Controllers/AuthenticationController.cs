@@ -2,7 +2,6 @@
 using Application.Models.User;
 using Domain.Entities;
 using Domain.Interfaces.Users;
-using Infraestructure.Repositories.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -16,9 +15,9 @@ namespace WebAPI.Controllers
     [ApiController]
     public class AuthenticateController : ControllerBase
     {
-        private readonly IUserRepository _userRepository;
+        private readonly IAuthenticationRepository _userRepository;
         private readonly IConfiguration _config;
-        public AuthenticateController(IUserRepository userRepository, IConfiguration configuration)
+        public AuthenticateController(IAuthenticationRepository userRepository, IConfiguration configuration)
         {
             _userRepository = userRepository;
             _config = configuration;
