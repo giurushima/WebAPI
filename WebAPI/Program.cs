@@ -1,7 +1,6 @@
 using Domain.Interfaces.Trips;
 using Domain.Interfaces.Truck;
 using Domain.Interfaces.Users;
-using Infraestructure.Repositories.Auth;
 using Infraestructure.Repositories.Truck;
 using Infraestructure.Repositories.Users;
 using Infrastructure.Repositories;
@@ -73,7 +72,6 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddScoped<ITruckerRepository, TruckerRepository>();
 builder.Services.AddScoped<ITripRepository, TripRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IAuthenticationRepository, AuthenticationRepository>();
 
 var app = builder.Build();
 

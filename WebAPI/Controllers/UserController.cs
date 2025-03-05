@@ -1,66 +1,67 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Domain.Entities;
-using Domain.Interfaces.Users;
+﻿//using Domain.Entities;
+//using Domain.Interfaces.Users;
+//using Microsoft.AspNetCore.Mvc;
 
-namespace Presentation.Controllers
-{
-    [Route("api/[controller]")]
-    [ApiController]
-    public class UserController : ControllerBase
-    {
-        private readonly IUserRepository _userRepository;
+//namespace WebAPI.Presentation.Controllers
+//{
+//    [ApiController]
+//    [Route("api/users")]
+//    public class UserController : ControllerBase
+//    {
+//        private readonly IUserRepository _infoUsersRepository;
 
-        public UserController(IUserRepository userRepository)
-        {
-            _userRepository = userRepository;
-        }
+//        public UserController(IUserRepository infoUsersRepository)
+//        {
+//            _infoUsersRepository = infoUsersRepository;
+//        }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAll()
-        {
-            var users = await _userRepository.GetAllAsync();
-            return Ok(users);
-        }
+//        [HttpGet]
+//        public ActionResult<IEnumerable<User>> GetUsers()
+//        {
+//            var users = _infoUsersRepository.Get();
+//            return Ok(users);
+//        }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id)
-        {
-            var user = await _userRepository.GetByIdAsync(id);
-            if (user == null)
-                return NotFound("Usuario no encontrado");
+//        [HttpGet("{id:int}")]
+//        public ActionResult<User> GetUser(int id)
+//        {
+//            var user = _infoUsersRepository.GetUser(id);
+//            if (user == null)
+//                return NotFound(new { message = "Usuario no encontrado" });
 
-            return Ok(user);
-        }
+//            return Ok(user);
+//        }
 
-        [HttpPost]
-        public async Task<IActionResult> Create([FromBody] User user)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+//        [HttpPost]
+//        public ActionResult<User> CreateUser([FromBody] User user)
+//        {
+//            if (user == null)
+//                return BadRequest(new { message = "Datos inválidos" });
 
-            await _userRepository.AddAsync(user);
-            return CreatedAtAction(nameof(GetById), new { id = user.Id }, user);
-        }
+//            int newUserId = _infoUsersRepository.AddUser(user);
+//            return CreatedAtAction(nameof(GetUser), new { name = user.UserName }, user);
+//        }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] User user)
-        {
-            if (id != user.Id)
-                return BadRequest("El ID del usuario no coincide");
+//        [HttpPut("{id}")]
+//        public IActionResult UpdateUser(int id, [FromBody] User user)
+//        {
+//            var existingUser = _infoUsersRepository.GetUser(id);
+//            if (existingUser == null)
+//                return NotFound(new { message = "Usuario no encontrado" });
 
-            await _userRepository.UpdateAsync(user);
-            return NoContent();
-        }
+//            _infoUsersRepository.UpdateUser(id, user);
+//            return NoContent();
+//        }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
-        {
-            var user = await _userRepository.GetByIdAsync(id);
-            if (user == null)
-                return NotFound("Usuario no encontrado");
+//        [HttpDelete("{id}")]
+//        public IActionResult DeleteUser(int id)
+//        {
+//            var userToDelete = _infoUsersRepository.GetUser(id);
+//            if (userToDelete == null)
+//                return NotFound(new { message = "Usuario no encontrado" });
 
-            await _userRepository.DeleteAsync(id);
-            return NoContent();
-        }
-    }
-}
+//            _infoUsersRepository.DeleteUser(id);
+//            return NoContent();
+//        }
+//    }
+//}

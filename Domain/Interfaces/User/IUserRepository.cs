@@ -9,10 +9,6 @@ namespace Domain.Interfaces.Users
 {
     public interface IUserRepository
     {
-        Task<IEnumerable<User>> GetAllAsync();
-        Task<User?> GetByIdAsync(int id);
-        Task AddAsync(User user);
-        Task UpdateAsync(User user);
-        Task DeleteAsync(int id);
+        User? Authenticate(string username, string password);
     }
 }

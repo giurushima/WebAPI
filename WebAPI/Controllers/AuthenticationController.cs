@@ -16,9 +16,9 @@ namespace WebAPI.Controllers
     [ApiController]
     public class AuthenticateController : ControllerBase
     {
-        private readonly IAuthenticationRepository _userRepository;
+        private readonly IUserRepository _userRepository;
         private readonly IConfiguration _config;
-        public AuthenticateController(IAuthenticationRepository userRepository, IConfiguration configuration)
+        public AuthenticateController(IUserRepository userRepository, IConfiguration configuration)
         {
             _userRepository = userRepository;
             _config = configuration;
