@@ -1,4 +1,5 @@
 ﻿using Domain.Entities;
+using Domain.Interfaces.Users;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ using WebAPI.Context;
 
 namespace Infraestructure.Repositories.Auth
 {
-    public class AuthenticationRepository
+    public class AuthenticationRepository : IAuthenticationRepository
     {
         private readonly ApplicationContext _context;
         public AuthenticationRepository(ApplicationContext context)
