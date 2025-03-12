@@ -16,7 +16,6 @@ namespace Application.Models.Truck
         [Required(ErrorMessage = "Ingrese tipo de carga (menor a 32 caracteres)")]
         [MaxLength(32)]
         public string? TruckerType { get; set; }
-        public Roles Roles { get; set; }
     }
 
     public class UpdateTruckDto
@@ -27,6 +26,5 @@ namespace Application.Models.Truck
         [Required(ErrorMessage = "Ingrese tipo de carga (menor a 32 caracteres)")]
         [MaxLength(32)]
         public string? TruckerType { get; set; }
-        public Roles Roles { get; set; }
     }
 }
