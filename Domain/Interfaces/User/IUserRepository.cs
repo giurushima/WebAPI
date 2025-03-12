@@ -9,10 +9,10 @@ namespace Domain.Interfaces.Users
 {
     public interface IUserRepository
     {
-        Task<IEnumerable<User>> GetAllAsync();
-        Task<User?> GetByIdAsync(int id);
-        Task AddAsync(User user);
-        Task UpdateAsync(User user);
-        Task DeleteAsync(int id);
+        Task<IEnumerable<User>> GetUsersAll();
+        Task<User?> GetUserById(int id);
+        Task CreateUser(User user);
+        Task UpdateUser(User user);
+        Task DeleteUser(int id);
     }
 }
