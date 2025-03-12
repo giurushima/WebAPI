@@ -18,3 +18,6 @@ namespace Application.Models.Auth
         public string? Password { get; set; }
     }
 }
+
+// Sirve de DTO para recibir las credenciales del usuario, en este caso se pasan las mismas y necesarias, pero suponiendo que tengamos otro dato mas sensible
+// con el DTO manejamos solo la data que queremos pasarle.
