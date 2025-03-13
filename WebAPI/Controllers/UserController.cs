@@ -31,7 +31,7 @@ namespace Presentation.Controllers
         {
             var user = await _userRepository.GetUserById(id);
             if (user == null)
-                return NotFound("Usuario no encontrado");
+                return NotFound(new { message = "Usuario no encontrado"});
 
             return Ok(user);
         }
@@ -40,9 +40,7 @@ namespace Presentation.Controllers
         [HttpPost("create")]
         public async Task<IActionResult> CreateUser([FromBody] CreateUserDto userDto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
+            
             var user = new User
             {
                 Name = userDto.Name,
@@ -59,8 +57,6 @@ namespace Presentation.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser(int id, [FromBody] UpdateUserDto userDto) 
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
 
             var user = await _userRepository.GetUserById(id);
             if (user == null)
@@ -72,7 +68,11 @@ namespace Presentation.Controllers
             user.Roles = userDto.Roles;
 
             await _userRepository.UpdateUser(user);
-            return NoContent();
+            return Ok(new
+            {
+                Mesagge = $"Usuario con ID {id} actualizado con exito",
+                UpdateUser = user
+            });
         }
 
         [Authorize(Roles = "Admin")]
@@ -81,10 +81,10 @@ namespace Presentation.Controllers
         {
             var user = await _userRepository.GetUserById(id);
             if (user == null)
-                return NotFound("Usuario no encontrado");
+                return NotFound(new { message = $"El usuario con ID {id} no fue encontrado." });
 
             await _userRepository.DeleteUser(id);
-            return NoContent();
+            return Ok(new { message = $"Usuario con ID {id} borrado con éxito." });
         }
     }
 }

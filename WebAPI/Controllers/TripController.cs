@@ -23,8 +23,15 @@ namespace API.Controllers
         public async Task<IActionResult> GetTripsByTrucker(int idTrucker)
         {
             var trips = await _tripRepository.GetTripsByTrucker(idTrucker);
-            if (trips == null) return NotFound();
-            return Ok(trips);
+
+            if (trips == null || !trips.Any())
+                return NotFound(new { message = $"No se encontraron viajes para el camionero con ID {idTrucker}." });
+
+            return Ok(new
+            {
+                message = $"Lista de viajes para el camionero con ID {idTrucker} obtenida con éxito.",
+                data = trips
+            });
         }
 
         [Authorize(Roles = "Admin,Supervisor,Employeer")]
@@ -32,16 +39,25 @@ namespace API.Controllers
         public async Task<IActionResult> GetTripByTrucker(int idTrucker, int idTrip)
         {
             var trip = await _tripRepository.GetTripByTruckerAndTripId(idTrucker, idTrip);
-            if (trip == null) return NotFound();
-            return Ok(trip);
+
+            if (trip == null)
+                return NotFound(new { message = $"No se encontró un viaje con el ID {idTrip} para el camionero con ID {idTrucker}." });
+
+            return Ok(new
+            {
+                message = $"Viaje con ID {idTrip} del camionero con ID {idTrucker} encontrado con éxito.",
+                data = trip
+            });
         }
 
         [Authorize(Roles = "Admin,Supervisor,Employeer")]
         [HttpPost("{idTrucker}/trips")]
         public async Task<IActionResult> CreateTrip(int idTrucker, [FromBody] CreateTripDto tripDto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            var trucker = await _tripRepository.GetTruckerById(idTrucker);
+
+            if (trucker == null)
+                return NotFound(new { message = $"No se encontró un camionero con ID {idTrucker}." });
 
             var trip = new Trip
             {
@@ -50,22 +66,20 @@ namespace API.Controllers
                 Kilometers = tripDto.Kilometers,
                 Description = tripDto.Description,
                 TripStatus = tripDto.TripStatus,
-                TruckerId = idTrucker
+                TruckerId = idTrucker,
             };
 
             await _tripRepository.AddTrip(trip);
 
-            return CreatedAtAction(nameof(GetTripByTrucker), new { idTrucker = idTrucker, idTrip = trip.Id }, trip);
+            return CreatedAtAction(nameof(GetTripByTrucker), new { idTrucker, idTrip = trip.Id }, trip);
         }
 
         [Authorize(Roles = "Admin,Supervisor,Employeer")]
         [HttpPut("{idTrucker}/{idTrip}")]
         public async Task<IActionResult> UpdateTrip(int idTrucker, int idTrip, [FromBody] UpdateTripDto tripDto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             var existingTrip = await _tripRepository.GetTripByTruckerAndTripId(idTrucker, idTrip);
+
             if (existingTrip == null)
                 return NotFound(new { message = $"No se encontro un viaje con el id {idTrip} para el camionero {idTrucker}." });
 
@@ -76,7 +90,12 @@ namespace API.Controllers
             existingTrip.TripStatus = tripDto.TripStatus;
 
             await _tripRepository.UpdateTrip(existingTrip);
-            return NoContent();
+
+            return Ok(new
+            {
+                message = $"Viaje con ID {idTrip} del camionero con ID {idTrucker} actualizado con exito.",
+                data = existingTrip
+            });
         }
 
         [Authorize(Roles = "Admin")]
@@ -84,11 +103,13 @@ namespace API.Controllers
         public async Task<IActionResult> DeleteTrip(int idTrucker, [FromRoute]int idTrip)
         {
             var existingTrip = await _tripRepository.GetTripByTruckerAndTripId(idTrucker, idTrip);
-            if (existingTrip == null) 
-                return NotFound();
+
+            if (existingTrip == null)
+                return NotFound(new { message = $"No se encontró un viaje con el ID {idTrip} para el camionero con ID {idTrucker}." });
 
             await _tripRepository.DeleteTrip(idTrip);
-                return NoContent();
+
+            return Ok(new { message = $"Viaje con ID {idTrip} del camionero con ID {idTrucker} eliminado con éxito." });
         }
 
         [Authorize(Roles = "Admin,Supervisor,Employeer")]
@@ -112,6 +133,12 @@ namespace API.Controllers
         public async Task<IActionResult> GetCompletedTrips()
         {
             var CompletedTrips = await _tripRepository.GetTripsByStatus(TripStatus.Completado);
+
+            if (!CompletedTrips.Any())
+            {
+                return NotFound(new { message = "No hay viajes completados en este momento." });
+            }
+
             return Ok(CompletedTrips);
         }
 
@@ -120,6 +147,12 @@ namespace API.Controllers
         public async Task<IActionResult> GetInProgressTrips()
         {
             var ProgressTrips = await _tripRepository.GetTripsByStatus(TripStatus.EnProgreso);
+
+            if (!ProgressTrips.Any())
+            {
+                return NotFound(new { message = "No hay viajes en progreso en este momento." });
+            }
+
             return Ok(ProgressTrips);
         }
 
@@ -128,6 +161,12 @@ namespace API.Controllers
         public async Task<IActionResult> GetPendingTrips()
         {
             var PendingTrips = await _tripRepository.GetTripsByStatus(TripStatus.Pendiente);
+
+            if (!PendingTrips.Any())
+            {
+                return NotFound(new { message = "No hay viajes pendientes en este momento." });
+            }
+
             return Ok(PendingTrips);
         }
 
@@ -136,6 +175,12 @@ namespace API.Controllers
         public async Task<IActionResult> GetCancelledTrips()
         {
             var CancelledTrips = await _tripRepository.GetTripsByStatus(TripStatus.Cancelado);
+
+            if (!CancelledTrips.Any())
+            {
+                return NotFound(new { message = "No hay viajes cancelados en este momento." });
+            }
+
             return Ok(CancelledTrips);
         }
     }

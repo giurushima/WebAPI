@@ -41,7 +41,24 @@ namespace WebAPI.Controllers
         [HttpGet("{id}/TotalKilometers")]
         public async Task<IActionResult> GetTruckerTotalKilometers(int id)
         {
+            var trucker = await _truckerRepository.GetTruckerById(id);
+
+            if (trucker == null)
+            {
+                return NotFound(new { message = $"No se encontró un camionero con el ID {id}." });
+            }
+
             var totalKm = await _truckerRepository.GetTruckerTotalKilometers(id);
+
+            if (totalKm == 0)
+            {
+                return Ok(new
+                {
+                    TruckerId = id,
+                    Kilometers = totalKm,
+                    Message = "El camionero no tiene kilometros recorridos en viajes completados."
+                });
+            }
 
             return Ok(new 
             {
@@ -82,7 +99,7 @@ namespace WebAPI.Controllers
 
             return Ok(new
             {
-                message = "Camionero actualizado con éxito.",
+                message = $"Camionero con ID {id} actualizado con éxito.",
                 data = existingTrucker
             });
         }
@@ -96,7 +113,7 @@ namespace WebAPI.Controllers
                 return NotFound(new { message = $"No se encontro un camionero con el ID {id}." });
 
             await _truckerRepository.DeleteTrucker(id);
-            return NoContent();
+            return Ok(new { message = $"Camionero con ID {id} eliminado con éxito." });
         }
     }
 }
