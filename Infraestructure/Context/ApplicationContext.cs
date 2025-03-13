@@ -57,7 +57,8 @@ namespace WebAPI.Context
                     Source = "Rosario, Santa Fe",
                     Destiny = "CABA, Buenos Aires",
                     Description = "Viaje de ...",
-                    TripStatus = TripStatus.Pending,
+                    Kilometers = 250,
+                    TripStatus = TripStatus.Pendiente,
                     TruckerId = truckers[0].Id,
                 },
                 new()
@@ -66,7 +67,8 @@ namespace WebAPI.Context
                     Source = "Arroyo Seco, Buenos Aires",
                     Destiny = "Bariloche, Rio Negro",
                     Description = "Viaje de ...",
-                    TripStatus = TripStatus.InProgress,
+                    Kilometers = 1400,
+                    TripStatus = TripStatus.EnProgreso,
                     TruckerId = truckers[0].Id,
                 },
                 new()
@@ -75,7 +77,8 @@ namespace WebAPI.Context
                     Source = "Rosario, Santa Fe",
                     Destiny = "Carlos Paz, Cordoba",
                     Description = "Viaje de ...",
-                    TripStatus = TripStatus.Complete,
+                    Kilometers = 400,
+                    TripStatus = TripStatus.Completado,
                     TruckerId = truckers[1].Id,
                 }
             };

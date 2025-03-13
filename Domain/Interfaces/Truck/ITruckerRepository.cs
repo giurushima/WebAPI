@@ -9,12 +9,12 @@ namespace Domain.Interfaces.Truck
 {
     public interface ITruckerRepository
     {
-        Task<List<Trucker>> GetTruckersWithoutTripsAll();
         Task<List<Trucker>> GetTruckersAll();
         Task<Trucker?> GetTruckerById(int id);
         Task<int> CreateTrucker(Trucker trucker);
         Task UpdateTrucker(int id, Trucker trucker);
         Task DeleteTrucker(int id);
         Task SaveChangesAsync();
+        Task<int> GetTruckerTotalKilometers(int truckerId);
     }
 }

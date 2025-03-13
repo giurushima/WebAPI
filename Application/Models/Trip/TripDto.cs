@@ -18,6 +18,7 @@ namespace Application.Models.Trip
         [Required(ErrorMessage = "Ingrese destino de viaje (mayor a 5 caracteres)")]
         [MinLength(5)]
         public string? Destiny { get; set; }
+        public int Kilometers { get; set; }
         [Required(ErrorMessage = "Ingrese descripcion de viaje (menor a 100 caracteres)")]
         [MaxLength(100)]
         public string? Description { get; set; }
@@ -33,10 +34,15 @@ namespace Application.Models.Trip
         [Required(ErrorMessage = "Ingrese destino de viaje (mayor a 5 caracteres)")]
         [MinLength(5)]
         public string? Destiny { get; set; }
+        public int Kilometers { get; set; }
         [Required(ErrorMessage = "Ingrese descripcion de viaje (menor a 100 caracteres)")]
         [MaxLength(100)]
         public string? Description { get; set; }
         [Required]
+        public TripStatus TripStatus { get; set; }
+    }
+    public class UpdateStatusTripDto 
+    {
         public TripStatus TripStatus { get; set; }
     }
 }

@@ -3,7 +3,6 @@ using Domain.Interfaces.Truck;
 using Domain.Interfaces.Users;
 using Infraestructure.Repositories.Auth;
 using Infraestructure.Repositories.Truck;
-using Infraestructure.Repositories.Users;
 using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;

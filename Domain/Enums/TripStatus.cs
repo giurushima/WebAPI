@@ -8,9 +8,9 @@ namespace Domain.Enums
 {
     public enum TripStatus
     {
-        Pending,
-        InProgress,
-        Complete,
-        Cancelled
+        Pendiente,
+        EnProgreso,
+        Completado,
+        Cancelado
     }
 }

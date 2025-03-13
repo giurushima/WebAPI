@@ -1,11 +1,14 @@
-﻿using Domain.Entities;
+﻿using Application.Models.Truck;
+using Domain.Entities;
+using Domain.Enums;
 using Domain.Interfaces.Truck;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 
 namespace WebAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/trucker")]
     [ApiController]
     public class TruckerController : ControllerBase
     {
@@ -16,49 +19,83 @@ namespace WebAPI.Controllers
             _truckerRepository = truckerRepository;
         }
 
-        [Authorize(Roles = "Admin")]
-        [HttpGet]
-        public ActionResult<IEnumerable<Trucker>> GetAll()
+        [Authorize(Roles = "Admin,Supervisor,Employeer")]
+        [HttpGet("all")]
+        public async Task<IActionResult> GetTruckersAll()
         {
-            return Ok(_truckerRepository.GetAll());
+            return Ok(await _truckerRepository.GetTruckersAll());
         }
 
+        [Authorize(Roles = "Admin,Supervisor,Employeer")]
         [HttpGet("{id}")]
-        public ActionResult<Trucker> GetById(int id)
+        public async Task<IActionResult> GetTruckerById(int id)
         {
-            var trucker = _truckerRepository.GetById(id);
+            var trucker = await _truckerRepository.GetTruckerById(id);
             if (trucker == null)
-                return NotFound();
+                return NotFound(new { message = $"No se encontró un camionero con el ID {id}." });
 
             return Ok(trucker);
         }
 
-        [HttpPost]
-        public ActionResult<int> Create([FromBody] Trucker trucker)
+        [Authorize(Roles = "Admin,Supervisor")]
+        [HttpGet("{id}/TotalKilometers")]
+        public async Task<IActionResult> GetTruckerTotalKilometers(int id)
         {
-            var id = _truckerRepository.Add(trucker);
-            return CreatedAtAction(nameof(GetById), new { id }, trucker);
+            var totalKm = await _truckerRepository.GetTruckerTotalKilometers(id);
+
+            return Ok(new 
+            {
+                TruckerId = id,
+                Kilometers = totalKm,
+                Message = $"El camionero ha recorrido {totalKm} kilometros"
+            });
         }
 
+        [Authorize(Roles = "Admin,Supervisor,Employeer")]
+        [HttpPost("create")]
+        public async Task<IActionResult> CreateTrucker([FromBody] CreateTruckDto truckDto)
+        {
+            var trucker = new Trucker
+            {
+                CompleteName = truckDto.CompleteName,
+                TruckerType = truckDto.TruckerType,
+                Roles = Domain.Enums.Roles.Trucker
+            };
+
+            var id = await _truckerRepository.CreateTrucker(trucker);
+            return CreatedAtAction(nameof(GetTruckerById), new { id }, new { message = "Camionero creado con éxito." });
+        }
+
+        [Authorize(Roles = "Admin,Supervisor,Employeer")]
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody] Trucker trucker)
+        public async Task<IActionResult> UpdateTrucker(int id, [FromBody] UpdateTruckDto truckDto)
         {
-            var existingTrucker = _truckerRepository.GetById(id);
+            var existingTrucker = await _truckerRepository.GetTruckerById(id);
             if (existingTrucker == null)
-                return NotFound();
+                return NotFound(new { message = $"No se encontró un camionero con el ID {id}." });
 
-            _truckerRepository.Update(id, trucker);
-            return NoContent();
+            existingTrucker.CompleteName = truckDto.CompleteName ?? existingTrucker.CompleteName;
+            existingTrucker.TruckerType = truckDto.TruckerType ?? existingTrucker.TruckerType;
+            existingTrucker.Roles = Roles.Trucker;
+
+            await _truckerRepository.UpdateTrucker(id, existingTrucker);
+
+            return Ok(new
+            {
+                message = "Camionero actualizado con éxito.",
+                data = existingTrucker
+            });
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> DeleteTrucker(int id)
         {
-            var existingTrucker = _truckerRepository.GetById(id);
-            if (existingTrucker == null)
-                return NotFound();
+            var trucker = await _truckerRepository.GetTruckerById(id);
+            if (trucker == null)
+                return NotFound(new { message = $"No se encontro un camionero con el ID {id}." });
 
-            _truckerRepository.Delete(id);
+            await _truckerRepository.DeleteTrucker(id);
             return NoContent();
         }
     }

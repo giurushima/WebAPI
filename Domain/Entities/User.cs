@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Domain.Enums;
+using System.Text.Json.Serialization;
 
 namespace Domain.Entities
 {
@@ -25,6 +26,7 @@ namespace Domain.Entities
         [MinLength(4)]
         public string? Password { get; set; }
         [Required(ErrorMessage = "Ingrese rol")]
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public Roles Roles { get; set; }
     }
 }

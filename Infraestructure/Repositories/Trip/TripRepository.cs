@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Domain.Interfaces.Trips;
 using WebAPI.Context;
+using Domain.Enums;
 
 namespace Infrastructure.Repositories
 {
@@ -14,7 +15,7 @@ namespace Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<IEnumerable<Trip>> GetTripsByTruckerAsync(int truckerId)
+        public async Task<IEnumerable<Trip>> GetTripsByTrucker(int truckerId)
         {
             return await _context.Trips
                 .Where(t => t.TruckerId == truckerId)
@@ -22,26 +23,26 @@ namespace Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        public async Task<Trip?> GetTripByTruckerAndTripIdAsync(int truckerId, int tripId)
+        public async Task<Trip?> GetTripByTruckerAndTripId(int truckerId, int tripId)
         {
             return await _context.Trips
                 .Include(t => t.Trucker)
                 .FirstOrDefaultAsync(t => t.TruckerId == truckerId && t.Id == tripId);
         }
 
-        public async Task AddTripAsync(Trip trip)
+        public async Task AddTrip(Trip trip)
         {
             _context.Trips.Add(trip);
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateTripAsync(Trip trip)
+        public async Task UpdateTrip(Trip trip)
         {
             _context.Trips.Update(trip);
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteTripAsync(int id)
+        public async Task DeleteTrip(int id)
         {
             var trip = await _context.Trips.FindAsync(id);
             if (trip != null)
@@ -49,6 +50,14 @@ namespace Infrastructure.Repositories
                 _context.Trips.Remove(trip);
                 await _context.SaveChangesAsync();
             }
+        }
+
+        public async Task<IEnumerable<Trip>> GetTripsByStatus(TripStatus status)
+        {
+            return await _context.Trips
+            .Where(trip => trip.TripStatus == status)
+            .Include(t => t.Trucker)
+            .ToListAsync();
         }
     }
 }

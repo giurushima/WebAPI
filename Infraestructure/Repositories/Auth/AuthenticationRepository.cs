@@ -24,3 +24,7 @@ namespace Infraestructure.Repositories.Auth
         }
     }
 }
+
+// La clase AuthenticationRepository implementa la interfaz IAuthenticationRepository.
+// Utiliza el dbcontext de entity framework para acceder a la tabla de usuarios.
+// Se usa LINQ para buscar el primer usuario cuya propiedad username y pass coincidan con las credenciales proporcionadas, si lo encuentra lo retorna si no null.

@@ -12,3 +12,6 @@ namespace Domain.Interfaces.Users
         User? Authenticate(string username, string password);
     }
 }
+
+// El metodo recibe un nombre de usuario y una contraseña
+// y devuelve el objeto USER si las credenciales son correctas.

@@ -1,5 +1,8 @@
-﻿using Domain.Entities;
+﻿using Application.Models.Trip;
+using Domain.Entities;
+using Domain.Enums;
 using Domain.Interfaces.Trips;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
@@ -15,58 +18,125 @@ namespace API.Controllers
             _tripRepository = tripRepository;
         }
 
-        // GET: /api/trips/{idTrucker}/trips
+        [Authorize(Roles = "Admin,Supervisor,Employeer")]
         [HttpGet("{idTrucker}/trips")]
         public async Task<IActionResult> GetTripsByTrucker(int idTrucker)
         {
-            var trips = await _tripRepository.GetTripsByTruckerAsync(idTrucker);
+            var trips = await _tripRepository.GetTripsByTrucker(idTrucker);
             if (trips == null) return NotFound();
             return Ok(trips);
         }
 
-        // GET: /api/trips/{idTrucker}/trips/{idTrip}
-        [HttpGet("{idTrucker}/trips/{idTrip}")]
+        [Authorize(Roles = "Admin,Supervisor,Employeer")]
+        [HttpGet("{idTrucker}/{idTrip}")]
         public async Task<IActionResult> GetTripByTrucker(int idTrucker, int idTrip)
         {
-            var trip = await _tripRepository.GetTripByTruckerAndTripIdAsync(idTrucker, idTrip);
+            var trip = await _tripRepository.GetTripByTruckerAndTripId(idTrucker, idTrip);
             if (trip == null) return NotFound();
             return Ok(trip);
         }
 
-
-        // POST: /api/trips/{idTrucker}/trips
+        [Authorize(Roles = "Admin,Supervisor,Employeer")]
         [HttpPost("{idTrucker}/trips")]
-        public async Task<IActionResult> CreateTrip(int idTrucker, [FromBody] Trip trip)
+        public async Task<IActionResult> CreateTrip(int idTrucker, [FromBody] CreateTripDto tripDto)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-            trip.TruckerId = idTrucker;
-            await _tripRepository.AddTripAsync(trip);
-            return CreatedAtAction(nameof(GetTripByTrucker), new { idTrucker, idTrip = trip.Id }, trip);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var trip = new Trip
+            {
+                Source = tripDto.Source,
+                Destiny = tripDto.Destiny,
+                Kilometers = tripDto.Kilometers,
+                Description = tripDto.Description,
+                TripStatus = tripDto.TripStatus,
+                TruckerId = idTrucker
+            };
+
+            await _tripRepository.AddTrip(trip);
+
+            return CreatedAtAction(nameof(GetTripByTrucker), new { idTrucker = idTrucker, idTrip = trip.Id }, trip);
         }
 
-        // PUT: /api/trips/{idTrucker}/trips/{idTrip}
-        [HttpPut("{idTrucker}/trips/{idTrip}")]
-        public async Task<IActionResult> UpdateTrip(int idTrucker, int idTrip, [FromBody] Trip trip)
+        [Authorize(Roles = "Admin,Supervisor,Employeer")]
+        [HttpPut("{idTrucker}/{idTrip}")]
+        public async Task<IActionResult> UpdateTrip(int idTrucker, int idTrip, [FromBody] UpdateTripDto tripDto)
         {
-            if (idTrip != trip.Id || idTrucker != trip.TruckerId) return BadRequest("ID mismatch");
-            if (!ModelState.IsValid) return BadRequest(ModelState);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-            var existingTrip = await _tripRepository.GetTripByTruckerAndTripIdAsync(idTrucker, idTrip);
-            if (existingTrip == null) return NotFound();
+            var existingTrip = await _tripRepository.GetTripByTruckerAndTripId(idTrucker, idTrip);
+            if (existingTrip == null)
+                return NotFound(new { message = $"No se encontro un viaje con el id {idTrip} para el camionero {idTrucker}." });
 
-            await _tripRepository.UpdateTripAsync(trip);
+            existingTrip.Source = tripDto.Source;
+            existingTrip.Destiny = tripDto.Destiny;
+            existingTrip.Kilometers = tripDto.Kilometers;
+            existingTrip.Description = tripDto.Description;
+            existingTrip.TripStatus = tripDto.TripStatus;
+
+            await _tripRepository.UpdateTrip(existingTrip);
             return NoContent();
         }
 
-        // DELETE: /api/trips/{idTrucker}/trips/{idTrip}
-        [HttpDelete("{idTrucker}/trips/{idTrip}")]
-        public async Task<IActionResult> DeleteTrip(int idTrucker, int idTrip)
+        [Authorize(Roles = "Admin")]
+        [HttpDelete("{idTrucker}/{idTrip}")]
+        public async Task<IActionResult> DeleteTrip(int idTrucker, [FromRoute]int idTrip)
         {
-            var existingTrip = await _tripRepository.GetTripByTruckerAndTripIdAsync(idTrucker, idTrip);
-            if (existingTrip == null) return NotFound();
+            var existingTrip = await _tripRepository.GetTripByTruckerAndTripId(idTrucker, idTrip);
+            if (existingTrip == null) 
+                return NotFound();
 
-            await _tripRepository.DeleteTripAsync(idTrip);
-            return NoContent();
+            await _tripRepository.DeleteTrip(idTrip);
+                return NoContent();
+        }
+
+        [Authorize(Roles = "Admin,Supervisor,Employeer")]
+        [HttpPost("{truckerId}/{tripId}/status")]
+        public async Task<IActionResult> UpdateTripStatus(int truckerId, [FromRoute]int tripId, [FromBody] UpdateStatusTripDto statusDto)
+        {
+            var trip = await _tripRepository.GetTripByTruckerAndTripId(truckerId, tripId);
+
+            if (trip == null)
+                return NotFound(new { message = $"No se encontró el viaje con ID {tripId} para el camionero {truckerId}." });
+
+            trip.TripStatus = statusDto.TripStatus;
+
+            await _tripRepository.UpdateTrip(trip);
+
+            return Ok(new { message = "Estado del viaje actualizado exitosamente.", trip });
+        }
+
+        [Authorize(Roles = "Admin,Supervisor,Employeer")]
+        [HttpGet("Completed")]
+        public async Task<IActionResult> GetCompletedTrips()
+        {
+            var CompletedTrips = await _tripRepository.GetTripsByStatus(TripStatus.Completado);
+            return Ok(CompletedTrips);
+        }
+
+        [Authorize(Roles = "Admin,Supervisor,Employeer")]
+        [HttpGet("Progress")]
+        public async Task<IActionResult> GetInProgressTrips()
+        {
+            var ProgressTrips = await _tripRepository.GetTripsByStatus(TripStatus.EnProgreso);
+            return Ok(ProgressTrips);
+        }
+
+        [Authorize(Roles = "Admin,Supervisor,Employeer")]
+        [HttpGet("Pending")]
+        public async Task<IActionResult> GetPendingTrips()
+        {
+            var PendingTrips = await _tripRepository.GetTripsByStatus(TripStatus.Pendiente);
+            return Ok(PendingTrips);
+        }
+
+        [Authorize(Roles = "Admin,Supervisor,Employeer")]
+        [HttpGet("Cancelled")]
+        public async Task<IActionResult> GetCancelledTrips()
+        {
+            var CancelledTrips = await _tripRepository.GetTripsByStatus(TripStatus.Cancelado);
+            return Ok(CancelledTrips);
         }
     }
 }

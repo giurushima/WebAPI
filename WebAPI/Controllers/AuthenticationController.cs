@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Reflection;
 using System.Security.Claims;
 using System.Text;
 
@@ -15,8 +16,8 @@ namespace WebAPI.Controllers
     [ApiController]
     public class AuthenticateController : ControllerBase
     {
-        private readonly IAuthenticationRepository _userRepository;
-        private readonly IConfiguration _config;
+        private readonly IAuthenticationRepository _userRepository; // Variable de lectura que almacena la instacnia del repositorio de auth.
+        private readonly IConfiguration _config; // Almacena la config de la app. incluye datos sensibles o virables que pueden cambiar segun el entorno.
         public AuthenticateController(IAuthenticationRepository userRepository, IConfiguration configuration)
         {
             _userRepository = userRepository;
@@ -25,14 +26,14 @@ namespace WebAPI.Controllers
         [HttpPost]
         public IActionResult Authenticate([FromBody] AuthenticationRequestBody credentials)
         {
-            Domain.Entities.User? userAuthenticated = _userRepository.Authenticate(credentials.UserName, credentials.Password);
+            Domain.Entities.User? userAuthenticated = _userRepository.Authenticate(credentials.UserName, credentials.Password); // se pasa nombre y user, el metodo authenticate busca en la db y retorna un objeto User si las credenciales coinciden o null si no se encuentra.
             if (userAuthenticated is not null)
             {
 
 
                 var securityPassword = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_config["Authentication:SecretForKey"])); //Traemos la SecretKey del Json. agregar antes: using Microsoft.IdentityModel.Tokens;
 
-                SigningCredentials signature = new SigningCredentials(securityPassword, SecurityAlgorithms.HmacSha256);
+                SigningCredentials signature = new SigningCredentials(securityPassword, SecurityAlgorithms.HmacSha256); // Con la clave de seguridad, se crean credenciales de firma usando el algoritmo HmacSha256, garantizando que sea seguro y no sea manipulable.
 
                 //Los claims son datos en clave->valor que nos permite guardar data del usuario.
                 var claimsForToken = new List<Claim>();
