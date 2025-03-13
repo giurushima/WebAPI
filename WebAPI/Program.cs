@@ -63,12 +63,6 @@ builder.Services.AddAuthentication("Bearer") //"Bearer" es el tipo de auntentica
     }
 );
 
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("ElevatedRights", policy =>
-          policy.RequireRole("Admin", "Supervisor", "Employeer", "Trucker"));
-});
-
 builder.Services.AddScoped<ITruckerRepository, TruckerRepository>();
 builder.Services.AddScoped<ITripRepository, TripRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
