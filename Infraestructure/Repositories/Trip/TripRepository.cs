@@ -59,5 +59,10 @@ namespace Infrastructure.Repositories
             .Include(t => t.Trucker)
             .ToListAsync();
         }
+        public async Task<Trucker?> GetTruckerById(int truckerId)
+        {
+            return await _context.Truckers.FirstOrDefaultAsync(t => t.Id == truckerId);
+        }
+
     }
 }

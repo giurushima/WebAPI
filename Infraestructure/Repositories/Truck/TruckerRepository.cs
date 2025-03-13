@@ -5,6 +5,7 @@ using WebAPI.Context;
 using System.Collections.Generic;
 using System.Linq;
 using Application.Models.Truck;
+using Domain.Enums;
 
 namespace Infraestructure.Repositories.Truck
 {
@@ -25,7 +26,7 @@ namespace Infraestructure.Repositories.Truck
         public async Task<int> GetTruckerTotalKilometers(int truckerId)
         {
             var totalKm = await _context.Trips
-                .Where(t => t.TruckerId == truckerId)
+                .Where(t => t.TruckerId == truckerId && t.TripStatus == TripStatus.Completado)
                 .SumAsync(t => t.Kilometers);
 
             return totalKm;

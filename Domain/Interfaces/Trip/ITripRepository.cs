@@ -16,5 +16,6 @@ namespace Domain.Interfaces.Trips
         Task UpdateTrip(Trip trip);
         Task DeleteTrip(int id);
         Task<IEnumerable<Trip>> GetTripsByStatus(TripStatus status);
+        Task<Trucker?> GetTruckerById(int id);
     }
 }
