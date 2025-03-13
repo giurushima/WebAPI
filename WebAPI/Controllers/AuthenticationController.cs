@@ -16,17 +16,17 @@ namespace WebAPI.Controllers
     [ApiController]
     public class AuthenticateController : ControllerBase
     {
-        private readonly IAuthenticationRepository _userRepository; // Variable de lectura que almacena la instacnia del repositorio de auth.
+        private readonly IAuthenticationRepository _authRepository; // Variable de lectura que almacena la instacnia del repositorio de auth.
         private readonly IConfiguration _config; // Almacena la config de la app. incluye datos sensibles o virables que pueden cambiar segun el entorno.
-        public AuthenticateController(IAuthenticationRepository userRepository, IConfiguration configuration)
+        public AuthenticateController(IAuthenticationRepository authRepository, IConfiguration configuration)
         {
-            _userRepository = userRepository;
+            _authRepository = authRepository;
             _config = configuration;
         }
         [HttpPost]
         public IActionResult Authenticate([FromBody] AuthenticationRequestBody credentials)
         {
-            Domain.Entities.User? userAuthenticated = _userRepository.Authenticate(credentials.UserName, credentials.Password); // se pasa nombre y user, el metodo authenticate busca en la db y retorna un objeto User si las credenciales coinciden o null si no se encuentra.
+            Domain.Entities.User? userAuthenticated = _authRepository.Authenticate(credentials.UserName, credentials.Password); // se pasa nombre y user, el metodo authenticate busca en la db y retorna un objeto User si las credenciales coinciden o null si no se encuentra.
             if (userAuthenticated is not null)
             {
 
