@@ -21,7 +21,7 @@ namespace WebAPI.Context
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
-            var truckers = new Trucker[3]
+            var truckers = new Trucker[5]
             {
 
                 new()
@@ -35,7 +35,7 @@ namespace WebAPI.Context
                 {
                     Id = 2,
                     CompleteName = "Martin Suarez",
-                    TruckerType = "Autos",
+                    TruckerType = "Automoviles",
                     Roles = Roles.Trucker,
                 },
                 new()
@@ -44,7 +44,22 @@ namespace WebAPI.Context
                     CompleteName = "Agustin Ramirez",
                     TruckerType = "Ganaderia",
                     Roles = Roles.Trucker,
+                },
+                new()
+                {
+                    Id = 4,
+                    CompleteName = "Benjamin Perez",
+                    TruckerType = "Combustibles",
+                    Roles = Roles.Trucker,
+                },
+                new()
+                {
+                    Id = 5,
+                    CompleteName = "Thiago Mendez",
+                    TruckerType = "Explosivos",
+                    Roles = Roles.Trucker,
                 }
+
             };
             modelBuilder.Entity<Trucker>().HasData(truckers);
 
@@ -69,7 +84,7 @@ namespace WebAPI.Context
                     Description = "Viaje de ...",
                     Kilometers = 1400,
                     TripStatus = TripStatus.EnProgreso,
-                    TruckerId = truckers[0].Id,
+                    TruckerId = truckers[2].Id,
                 },
                 new()
                 {
